@@ -13,14 +13,17 @@
 <body>
 
 <!-- Add your site or application content here -->
-<h1>Neighborhood Map</h1>
-<div id="map" class="map"></div>
-
+<div>
+    <div class="options-box">
+    <h1>Neighborhood Map</h1>
+    </div>
+    <div id="map" class="map"></div>
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
 <script src="js/homepage.js"></script>
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPQUBSBQep6puO1Ot_1ZGaf1pG-i0X55c&callback=view.initMap">
+        src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAPQUBSBQep6puO1Ot_1ZGaf1pG-i0X55c&callback=viewModel.initMap">
 </script>
 
 

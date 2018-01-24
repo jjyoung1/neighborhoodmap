@@ -11,11 +11,15 @@ var model = {
         "lat": 43.9140162,
         "lng": -69.96699599999999
     },
-
     map: null,
+    places_svc: null,
 
     init: function () {
+    },
 
+    mapInit: function (map) {
+        this.map = map;
+        this.places_svc = new google.maps.places.PlacesService(map);
     }
 
 };
@@ -32,31 +36,29 @@ var viewModel = {
     init_app: function () {
         model.init();
         view.init();
+    },
+
+    // Asynchronous callback from the google maps api
+    initMap: function () {
+        model.mapInit(view.setupMap());
     }
 };
 
 var view = {
     init: function () {
-        // init_map(viewModel.getDefaultLocation(), viewModel.getDefaultZoom());
+
     },
 
-    initMap: function () {
+    // Creates a new map at the default location and inserts it into the page
+    // returns the map handle to caller
+    setupMap: function () {
         var elem = $('map');
-        map = new google.maps.Map($('#map')[0], {
+        return (new google.maps.Map($('#map')[0], {
             center: viewModel.getDefaultLocation(),
             zoom: viewModel.getDefaultZoom(),
             mapTypeControl: false
-        });
+        }));
     }
 }
-
-// function initMap() {
-//     var elem = $('map');
-//     map = new google.maps.Map($('#map')[0], {
-//         center: viewModel.getDefaultLocation(),
-//         zoom: viewModel.getDefaultZoom(),
-//         mapTypeControl: false
-//     });
-// }
 
 // })();

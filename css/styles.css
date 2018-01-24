@@ -82,33 +82,18 @@ textarea {
     resize: vertical;
 }
 
-
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
-  #map {
+#map {
     height: 100%;
-  }
-  html, body {
+}
+
+html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 /* ==========================================================================
    Helper classes
@@ -205,9 +190,9 @@ textarea {
 }
 
 @media print,
-       (-webkit-min-device-pixel-ratio: 1.25),
-       (min-resolution: 1.25dppx),
-       (min-resolution: 120dpi) {
+(-webkit-min-device-pixel-ratio: 1.25),
+(min-resolution: 1.25dppx),
+(min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
 }
 
@@ -222,8 +207,9 @@ textarea {
     *:before,
     *:after {
         background: transparent !important;
-        color: #000 !important; /* Black prints faster:
-                                   http://www.sanbeiji.com/archives/953 */
+        color: #000 !important;
+        /* Black prints faster:
+                                          http://www.sanbeiji.com/archives/953 */
         box-shadow: none !important;
         text-shadow: none !important;
     }
@@ -245,7 +231,6 @@ textarea {
      * Don't show links that are fragment identifiers,
      * or use the `javascript:` pseudo protocol
      */
-
     a[href^="#"]:after,
     a[href^="javascript:"]:after {
         content: "";
@@ -254,6 +239,7 @@ textarea {
     pre {
         white-space: pre-wrap !important;
     }
+
     pre,
     blockquote {
         border: 1px solid #999;
@@ -264,7 +250,6 @@ textarea {
      * Printing Tables:
      * http://css-discuss.incutio.com/wiki/Printing_Tables
      */
-
     thead {
         display: table-header-group;
     }
@@ -287,16 +272,30 @@ textarea {
     }
 }
 
-
 /*
  * Start of neighborhoodmap specific styling
  */
-  #map {
+#map {
+    bottom: 0px;
     height: 100%;
-  }
+    left: 362px;
+    position: absolute;
+    right: 0px;
+}
 
-  html, body {
+html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-  }
+}
+
+.options-box {
+        background: #fff;
+        border: 1px solid #999;
+        border-radius: 3px;
+        height: 100%;
+        line-height: 35px;
+        padding: 10px 10px 30px 10px;
+        text-align: left;
+        width: 340px;
+      }
