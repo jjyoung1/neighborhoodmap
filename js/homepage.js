@@ -20,7 +20,20 @@ var model = {
     mapInit: function (map) {
         this.map = map;
         this.places_svc = new google.maps.places.PlacesService(map);
+        var request = {
+            location: this.default_location,
+            radius: '20',
+            query: 'Benchwarmers'
+        };
+        this.places_svc.textSearch(request, function (results, status) {
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < results.length; i++) {
+                    place = results[i];
+                }
+            }
+        });
     }
+
 
 };
 
