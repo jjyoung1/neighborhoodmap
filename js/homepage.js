@@ -5,14 +5,6 @@ var model = {
      * Latitude and Longitude of Brunswick Maine as returned by Google Maps
      * https://maps.googleapis.com/maps/api/geocode/json?address=brunswick,me&key=KEY
      */
-    default_locations: [
-        "Byrnes Irish Pub",
-        "Benchwarmers",
-        "Frontier",
-        "Coast Bar + Bistro",
-        "Toasty's Tavern"
-    ],
-
     default_zoom: 13,
 
     default_location: {
@@ -30,41 +22,23 @@ var model = {
     mapInit: function (map) {
         this.map = map;
         this.places_svc = new google.maps.places.PlacesService(map);
-        // var request = {
-        //     location: this.default_location,
-        //     radius: '20',
-        //     query: this.default_locations[0]
-        // };
-        // //Test code
-        // this.places_svc.textSearch(request, function (results, status) {
-        //     if (status === google.maps.places.PlacesServiceStatus.OK) {
-        //         r = results;
-        //     }
-        // });
-        this.default_locations.forEach(function (loc) {
-            var request = {
-                location: model.default_location,
-                radius: '20',
-                query: loc
-            }
-            model.places_svc.textSearch(request, function (results, status) {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    model.locations.push(results);
+    },
 
-                }
-            });
-            //     model.places_svc.textSearch(request, function (results, status) {
-            //         var i = 0;
-            //         if (status == google.maps.places.PlacesServiceStatus.OK) {
-            //             locations.push(results[0]);
-            //         }
-            //     });
-        });
+    // Performs asynchronous call to google maps places api
+    findLocationByDescription: function (descr, callback) {
+        var request = {
+            location: model.default_location,
+            radius: '20',
+            query: descr
+        };
+        this.places_svc.textSearch(request, callback);
     }
 };
 
 
 var viewModel = {
+    self: this,
+
     getDefaultLocation: function () {
         return model.default_location;
     },
@@ -78,12 +52,37 @@ var viewModel = {
         view.init();
     },
 
+    // callback from google maps places api
+    // Setup location markers and lists
+    setupLocation: function (results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            model.locations.push(results);
+
+            //TODO: create marker
+        }
+    },
+
+    default_locations: [
+        "Byrnes Irish Pub",
+        "Benchwarmers",
+        "Frontier",
+        "Coast Bar + Bistro",
+        "Toasty's Tavern"
+    ],
+
     // Asynchronous callback from the google maps api
     initMap: function () {
         model.mapInit(view.setupMap());
-        var i = 1;
-    }
 
+        // Setup initial locations
+        this.default_locations.forEach(function (descr){
+            console.log(descr);
+            callback = this.setupLocation();
+            model.findLocationByDescription(descr, function(){viewModel.setupLocation});
+        });
+
+
+    }
 };
 
 var view = {
@@ -101,6 +100,6 @@ var view = {
             mapTypeControl: false
         }));
     }
-}
+};
 
 // })();
