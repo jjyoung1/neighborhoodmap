@@ -1,106 +1,139 @@
+var app = window.app || {};
+
 // (function () {
 
-var model = {
+app.model = (new function (ko) {
     /*
      * Latitude and Longitude of Brunswick Maine as returned by Google Maps
      * https://maps.googleapis.com/maps/api/geocode/json?address=brunswick,me&key=KEY
      */
-    default_zoom: 13,
+    var self = this;
+    var me;
+    var default_zoom = 13;
 
-    default_location: {
+    var default_location = {
         "lat": 43.9140162,
         "lng": -69.96699599999999
-    },
+    };
 
-    map: null,
-    places_svc: null,
-    locations: [],
+    this.map = null;
+    this.places_svc = null;
+    this.locations = [];
 
-    init: function () {
-    },
+    me = {
+        init: init,
+        findLocationByDescription: findLocationByDescription,
+        mapInit: mapInit
+    };
 
-    mapInit: function (map) {
-        this.map = map;
-        this.places_svc = new google.maps.places.PlacesService(map);
-    },
+    function init() {
+    }
+
+    function mapInit(map) {
+        self.map = map;
+        self.places_svc = new google.maps.places.PlacesService(map);
+    }
 
     // Performs asynchronous call to google maps places api
-    findLocationByDescription: function (descr, callback) {
+    function findLocationByDescription(descr, callback) {
         var request = {
-            location: model.default_location,
+            location: app.model.default_location,
             radius: '20',
             query: descr
         };
-        this.places_svc.textSearch(request, callback);
+        self.places_svc.textSearch(request, callback);
     }
-};
+    return me;
+}(ko));
 
 
-var viewModel = {
-    self: this,
+app.viewModel = (function (ko) {
+    'use strict';
+    var self = this;
 
-    getDefaultLocation: function () {
-        return model.default_location;
-    },
+    var me = {
+        init_app: init_app,
+        initMap: initMap,
+        getDefaultLocation: getDefaultLocation,
+        getDefaultZoom: getDefaultZoom
+    };
 
-    getDefaultZoom: function () {
-        return model.default_zoom;
-    },
-
-    init_app: function () {
-        model.init();
-        view.init();
-    },
-
-    // callback from google maps places api
-    // Setup location markers and lists
-    setupLocation: function (results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            model.locations.push(results);
-
-            //TODO: create marker
-        }
-    },
-
-    default_locations: [
+    var default_locations = [
         "Byrnes Irish Pub",
         "Benchwarmers",
         "Frontier",
         "Coast Bar + Bistro",
         "Toasty's Tavern"
-    ],
+    ];
+
+    function getDefaultLocation() {
+        return app.model.default_location;
+    }
+
+    function getDefaultZoom() {
+        return app.model.default_zoom;
+    }
+
+    function init_app() {
+        app.model.init();
+        app.view.init();
+    }
+
+    // callback from google maps places api
+    // Setup location markers and lists
+    function setupLocation(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            app.model.locations.push(results);
+
+            //TODO: create marker
+        }
+    }
 
     // Asynchronous callback from the google maps api
-    initMap: function () {
-        model.mapInit(view.setupMap());
+    function initMap() {
+        app.model.mapInit(app.view.setupMap());
 
         // Setup initial locations
-        this.default_locations.forEach(function (descr){
+        default_locations.forEach(function (descr) {
             console.log(descr);
-            callback = this.setupLocation();
-            model.findLocationByDescription(descr, function(){viewModel.setupLocation});
-        });
+            self.callback = self.setupLocation;
+            app.model.findLocationByDescription(descr, function () {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    app.model.locations.push(results);
 
+                    //TODO: create marker
+                }
+            });
+        });
+    }
+
+    return me;
+}(ko));
+
+app.view = (function ($, ko) {
+    'use strict';
+    var self = this;
+
+    var me = {
+        init: init,
+        setupMap: setupMap
+    };
+
+    function init() {
 
     }
-};
-
-var view = {
-    init: function () {
-
-    },
 
     // Creates a new map at the default location and inserts it into the page
     // returns the map handle to caller
-    setupMap: function () {
+    function setupMap() {
         // $('#map').height($('body').clientHeight())
         var elem = $('map');
         return (new google.maps.Map($('#map')[0], {
-            center: viewModel.getDefaultLocation(),
-            zoom: viewModel.getDefaultZoom(),
+            center: app.viewModel.getDefaultLocation(),
+            zoom: app.viewModel.getDefaultZoom(),
             mapTypeControl: false
         }));
     }
-};
+    return me;
+}(jQuery, ko));
 
-// })();
