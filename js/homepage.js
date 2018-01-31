@@ -93,6 +93,7 @@ var view = {
     // Creates a new map at the default location and inserts it into the page
     // returns the map handle to caller
     setupMap: function () {
+        // $('#map').height($('body').clientHeight())
         var elem = $('map');
         return (new google.maps.Map($('#map')[0], {
             center: viewModel.getDefaultLocation(),
