@@ -55,7 +55,7 @@ app.view = (function ($, ko) {
  * Google Map Code
  *******************************************************************/
 
-app.google = (function () {
+app.google = new function () {
     var self = this;
     var me = {
         initMap: initMap
@@ -84,28 +84,23 @@ app.google = (function () {
 // Setup location markers and lists
     function setupLocation(results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-            locations.push(results);
+            self.locations.push(results);
         }
-    }
 
+        //TODO: create marker
+    };
 // Performs asynchronous call to google maps places api
     function findLocationByDescription(descr, callback) {
-        var request = {
-            location: app.model.default_location,
-            radius: '20',
-            query: descr
-        };
-        self.places_svc.textSearch(request, callback);
     }
 
 
 // Asynchronous callback from the google maps api
     function initMap() {
+        var elem = $('map');
 
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
-        places_svc = new google.maps.places.PlacesService(map);
-        var elem = $('map');
+        self.places_svc = new google.maps.places.PlacesService(map);
         self.map = new google.maps.Map($('#map')[0], {
             center: self.default_location,
             zoom: self.default_zoom,
@@ -113,17 +108,17 @@ app.google = (function () {
         });
 
         // Setup initial locations
-        // default_locations.forEach(function (descr) {
-        //     console.log(descr);
-        //     self.callback = self.setupLocation;
-        //     app.model.findLocationByDescription(descr, function () {
-        //         if (status === google.maps.places.PlacesServiceStatus.OK) {
-        //             app.model.locations.push(results);
-        //
-        //             //TODO: create marker
-        //         }
-        //     });
-        // });
+        self.default_locations.forEach(function (descr) {
+            console.log(descr);
+            // self.callback = self.setupLocation;
+            var request = {
+                location: self.default_location,
+                radius: '20',
+                query: descr
+            };
+            self.places_svc.textSearch(request, setupLocation);
+        });
     }
+
     return me;
-}());
+};
