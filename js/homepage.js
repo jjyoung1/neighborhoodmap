@@ -64,6 +64,7 @@ app.google = new function () {
     this.map = null;
     this.places_svc = null;
     this.locations = [];
+    this.markers = [];
 
     this.default_locations = [
         "Byrnes Irish Pub",
@@ -85,10 +86,17 @@ app.google = new function () {
     function setupLocation(results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
             self.locations.push(results);
-        }
 
-        //TODO: create marker
-    };
+            //TODO: create marker
+            self.markers.push(new google.maps.Marker({
+                position: results[0].geometry.location,
+                map: self.map
+            }))
+
+            Look = "Look here";
+        }
+    }
+
 // Performs asynchronous call to google maps places api
     function findLocationByDescription(descr, callback) {
     }
@@ -100,17 +108,18 @@ app.google = new function () {
 
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
-        self.places_svc = new google.maps.places.PlacesService(map);
         self.map = new google.maps.Map($('#map')[0], {
             center: self.default_location,
             zoom: self.default_zoom,
             mapTypeControl: false
         });
 
+        self.places_svc = new google.maps.places.PlacesService(self.map);
+
         // Setup initial locations
         self.default_locations.forEach(function (descr) {
             console.log(descr);
-            // self.callback = self.setupLocation;
+            self.callback = self.setupLocation;
             var request = {
                 location: self.default_location,
                 radius: '20',
