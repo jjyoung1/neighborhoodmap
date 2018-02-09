@@ -16,7 +16,6 @@
 .idea/**/sqlDataSources.xml
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
-
 # Gradle:
 .idea/**/gradle.xml
 .idea/**/libraries
@@ -51,3 +50,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# My changes
+.idea/**/inspectionProfiles/
