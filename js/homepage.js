@@ -92,17 +92,20 @@ app.google = new function () {
 // callback from google maps places api
 // Setup location markers and lists
     function setupLocation(results, status) {
+        var marker;
         if (status === google.maps.places.PlacesServiceStatus.OK) {
             self.locations.push(results);
 
             //TODO: create marker
-            var marker = new google.maps.Marker({
+            marker = new google.maps.Marker({
                 position: results[0].geometry.location,
                 map: self.map,
                 title: results[0].name,
                 animation: google.maps.Animation.DROP
             });
             self.markers.push(marker);
+            // self.bounds.extend(marker.position);
+
             marker.addListener('click', function () {
                 populateInfoWindow(this, self.infowindow);
             });
@@ -123,8 +126,8 @@ app.google = new function () {
             infowindow.marker = marker;
             infowindow.setContent('<div>' + marker.title + '</div>');
             infowindow.open(map, marker);
-            infowindow.addListener('closeClick', function () {
-                infowindow.setMarker(null);
+            infowindow.addListener('closeclick', function () {
+                infowindow.marker = null;
             });
         }
     }
@@ -152,6 +155,10 @@ app.google = new function () {
     function initMap() {
         var elem = $('map');
 
+        // Initialize the ViewModel
+        app.viewModel.init_app();
+        ko.applyBindings(app.viewModel);
+
         this.default_location = new google.maps.LatLng(self.default_location);
 
         self.highlightedIcon = makeMarkerIcon('FFFF24');
@@ -167,6 +174,7 @@ app.google = new function () {
         self.places_svc = new google.maps.places.PlacesService(self.map);
 
         self.infowindow = new google.maps.InfoWindow();
+        self.bounds = new google.maps.LatLngBounds();
 
         // Setup initial locations
         self.default_locations.forEach(function (descr) {
@@ -179,6 +187,8 @@ app.google = new function () {
             };
             self.places_svc.nearbySearch(request, setupLocation);
         });
+
+        // self.map.fitBounds(self.bounds);
     }
 
     return me;
