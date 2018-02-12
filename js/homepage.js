@@ -67,18 +67,25 @@ app.google = new function () {
     this.markers = [];
 
     this.default_locations = [
+        "Hannafords",
         "Byrnes Irish Pub",
         "Benchwarmers",
         "Frontier",
         "Coast Bar + Bistro",
-        "Toasty's Tavern"
+        "Toasty's Tavern",
+        "Walmart",
+        "Little Dog",
+        "Lowes",
+        "Bowdoin College",
+        "School",
+        "Bar"
     ];
 
     this.default_zoom = 13;
 
     this.default_location = {
-        "lat": 43.9140162,
-        "lng": -69.96699599999999
+        lat: 43.9140162,
+        lng: -69.96699599999999
     };
 
 // callback from google maps places api
@@ -106,6 +113,8 @@ app.google = new function () {
     function initMap() {
         var elem = $('map');
 
+        this.default_location = new google.maps.LatLng(self.default_location);
+
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
         self.map = new google.maps.Map($('#map')[0], {
@@ -122,10 +131,10 @@ app.google = new function () {
             self.callback = self.setupLocation;
             var request = {
                 location: self.default_location,
-                radius: '20',
-                query: descr
+                radius: '20000',
+                name: descr
             };
-            self.places_svc.textSearch(request, setupLocation);
+            self.places_svc.nearbySearch(request, setupLocation);
         });
     }
 
