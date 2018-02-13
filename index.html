@@ -16,7 +16,7 @@
 <div id="container">
     <div id="options-box">
         <h1>Neighborhood Map</h1>
-        <p>Map Filter: <select data-bind="options: filterArray"></select></p>
+        <p>Map Filter: <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select></p>
         <div >
             <ul data-bind="foreach: markers">
                 <li data-bind="text: $data.title">marker</li>

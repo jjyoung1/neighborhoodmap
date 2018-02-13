@@ -37,9 +37,10 @@ app.ViewModel = function () {
     this.locations = [];
 
     // filterSet is used to combine the place types for all the markers
-    // filterArray is created from a filterSet since ko doesn't have an observable Set type
+    // filterOptionsArray is created from a filterSet since ko doesn't have an observable Set type
     this.filterSet = new Set();
-    this.filterArray = ko.observableArray([]);
+    this.filterOptionsArray = ko.observableArray(['All']);
+    this.selectedFilterValue = ko.observable(this.filterOptionsArray[0]);
 
     this.markers = ko.observableArray([]);
     this.markers.extend({rateLimit: 50});
@@ -52,16 +53,36 @@ app.ViewModel = function () {
         lng: -69.96699599999999
     };
 
-    function populateFilterList(typeArray){
-        self.filterSet.add('All');
-        typeArray.forEach(function(type) {
-            self.filterSet.add(type);
-        });
-        self.filterArray.removeAll();
-        self.filterSet.forEach(function(elem){
-            self.filterArray.push(elem);
+    this.selectedFilterValue.subscribe(function(newValue, event) {
+        console.log('Filter Selected: '+newValue);
+        filterMarkers(newValue);
+    });
+
+    // Check if marker is the specified type
+    function isMarkerType(type) {
+
+    }
+
+    // TODO: close any open infowindows and apply filter to list
+    function filterMarkers(filter) {
+        self.markers().forEach(function(marker) {
+            if (marker.types.indexOf(filter) >= 0) {
+            marker.setVisible(true);
+            } else {
+                marker.setVisible(false);
+            }
         });
     }
+
+    // Populate the filter dropdown based on the types of markers returned from places
+    function populateFilterList(typeArray){
+        typeArray.forEach(function(elem){
+            if (self.filterOptionsArray.indexOf(elem) < 0){
+                self.filterOptionsArray.push(elem);
+            }
+        });
+    }
+
     // callback from google maps places api
     // Setup location markers and lists
     function setupLocation(results, status) {
