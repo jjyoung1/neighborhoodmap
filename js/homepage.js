@@ -61,7 +61,8 @@ app.ViewModel = function () {
                 title: results[0].name,
                 animation: google.maps.Animation.DROP
             });
-            // self.bounds.extend(marker.position);
+            self.bounds.extend(marker.position);
+            self.map.fitBounds(self.bounds);
 
             marker.addListener('click', function () {
                 populateInfoWindow(this, self.infowindow);
@@ -122,7 +123,6 @@ app.ViewModel = function () {
             self.places_svc.nearbySearch(request, setupLocation);
         });
 
-        // self.map.fitBounds(self.bounds);
 
     }
 
