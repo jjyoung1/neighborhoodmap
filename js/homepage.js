@@ -36,6 +36,11 @@ app.ViewModel = function () {
     this.places_svc = null;
     this.locations = [];
 
+    // filterSet is used to combine the place types for all the markers
+    // filterArray is created from a filterSet since ko doesn't have an observable Set type
+    this.filterSet = new Set();
+    this.filterArray = ko.observableArray([]);
+
     this.markers = ko.observableArray([]);
     this.markers.extend({rateLimit: 50});
 
@@ -47,6 +52,16 @@ app.ViewModel = function () {
         lng: -69.96699599999999
     };
 
+    function populateFilterList(typeArray){
+        self.filterSet.add('All');
+        typeArray.forEach(function(type) {
+            self.filterSet.add(type);
+        });
+        self.filterArray.removeAll();
+        self.filterSet.forEach(function(elem){
+            self.filterArray.push(elem);
+        });
+    }
     // callback from google maps places api
     // Setup location markers and lists
     function setupLocation(results, status) {
@@ -54,27 +69,36 @@ app.ViewModel = function () {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
             self.locations.push(results);
 
-            //TODO: create marker
             marker = new google.maps.Marker({
                 position: results[0].geometry.location,
                 map: self.map,
                 title: results[0].name,
                 animation: google.maps.Animation.DROP
             });
+            // Add the location types for this marker to aid in filtering.
+            marker.types = results[0].types;
+
             self.bounds.extend(marker.position);
             self.map.fitBounds(self.bounds);
 
+            populateFilterList(marker.types);
+
             marker.addListener('click', function () {
                 populateInfoWindow(this, self.infowindow);
+                this.setIcon(self.clickedIcon);
             });
 
+            //
+            marker.redIcon = marker.getIcon();
+            marker.defaultIcon = marker.getIcon();
+
             marker.addListener('mouseover', function () {
-                self.defaultIcon = this.getIcon();
+
                 this.setIcon(self.highlightedIcon);
             });
 
             marker.addListener('mouseout', function () {
-                this.setIcon(self.defaultIcon);
+                this.setIcon(this.defaultIcon);
             });
 
             self.markers.push(marker);
@@ -97,6 +121,7 @@ app.ViewModel = function () {
         self.default_location = new google.maps.LatLng(self.default_location);
 
         self.highlightedIcon = makeMarkerIcon('FFFF24');
+        self.clickedIcon = makeMarkerIcon('1E90FF');
 
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
