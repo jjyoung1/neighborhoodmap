@@ -1,19 +1,19 @@
-// var app = window.app || {};
+var app = window.app || {};
 
 // (function () {
 /*******************************************************************
  * Google Map Code
  *******************************************************************/
 
-var initMap = function() {
+app.initMap = function() {
     // Initialize the ViewModel
-    ko.applyBindings(new ViewModel);
+    ko.applyBindings(new app.ViewModel);
 };
 
 var stop = "Stop Here";
 
 
-var ViewModel = function () {
+app.ViewModel = function () {
     'use strict';
     var self = this;
 
