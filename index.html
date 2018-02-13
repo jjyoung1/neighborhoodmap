@@ -16,11 +16,11 @@
 <div id="container">
     <div id="options-box">
         <h1>Neighborhood Map</h1>
-        <ul>
-            <li>Item 1</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-        </ul>
+        <div >
+            <ul data-bind="foreach: this.markers">
+                <li data-bind="text: $data.title"></li>
+            </ul>
+        </div>
     </div>
 
     <div id="map" class="map"></div>

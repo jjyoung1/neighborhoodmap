@@ -9,64 +9,11 @@ app.model = (new function (ko) {
      */
     var self = this;
     var me = {
-        init: init
+        init: init,
+        getDefaultLocations: getDefaultLocations
     };
 
-
-    function init() {
-    }
-
-    return me;
-}(ko));
-
-app.viewModel = (function (ko) {
-    'use strict';
-    var self = this;
-
-    var me = {
-        init_app: init_app
-    };
-
-    function init_app() {
-        app.model.init();
-        app.view.init();
-    }
-
-    return me;
-}(ko));
-
-
-app.view = (function ($, ko) {
-    'use strict';
-    var self = this;
-    var me = {
-        init: init
-    };
-
-
-    function init() {
-
-    }
-
-    return me;
-}(jQuery, ko));
-
-/*******************************************************************
- * Google Map Code
- *******************************************************************/
-
-app.google = new function () {
-    var self = this;
-    var me = {
-        initMap: initMap
-    };
-
-    this.map = null;
-    this.places_svc = null;
-    this.locations = [];
-    this.markers = [];
-
-    this.default_locations = [
+    default_locations = [
         "Hannafords",
         "Byrnes Irish Pub",
         "Benchwarmers",
@@ -81,6 +28,31 @@ app.google = new function () {
         "Bar"
     ];
 
+    function getDefaultLocations() {
+        return default_locations;
+    }
+
+    function init() {
+    }
+
+    return me;
+}(ko));
+
+app.viewModel = (new function (ko) {
+    'use strict';
+    var self = this;
+
+    var me = {
+        init_app: init_app
+    };
+
+    this.map = null;
+    this.places_svc = null;
+    this.locations = [];
+
+    this.markers = ko.observableArray([]);
+    this.markers.extend({rateLimit: 50});
+
     this.default_zoom = 13;
 
     this.default_location = {
@@ -88,9 +60,14 @@ app.google = new function () {
         lng: -69.96699599999999
     };
 
+    function init_app() {
+        app.model.init();
+        app.view.init();
+        init_map();
+    }
 
-// callback from google maps places api
-// Setup location markers and lists
+    // callback from google maps places api
+    // Setup location markers and lists
     function setupLocation(results, status) {
         var marker;
         if (status === google.maps.places.PlacesServiceStatus.OK) {
@@ -103,7 +80,6 @@ app.google = new function () {
                 title: results[0].name,
                 animation: google.maps.Animation.DROP
             });
-            self.markers.push(marker);
             // self.bounds.extend(marker.position);
 
             marker.addListener('click', function () {
@@ -113,11 +89,14 @@ app.google = new function () {
             marker.addListener('mouseover', function () {
                 self.defaultIcon = this.getIcon();
                 this.setIcon(self.highlightedIcon);
-            })
+            });
 
             marker.addListener('mouseout', function () {
                 this.setIcon(self.defaultIcon);
-            })
+            });
+
+            self.markers.push(marker);
+            console.log("created Marker Title " + self.markers()[self.markers().length - 1].title);
         }
     }
 
@@ -130,6 +109,57 @@ app.google = new function () {
                 infowindow.marker = null;
             });
         }
+    }
+
+    function init_map() {
+        self.default_location = new google.maps.LatLng(self.default_location);
+
+        self.highlightedIcon = app.view.makeMarkerIcon('FFFF24');
+
+        // Creates a new map at the default location and inserts it into the page
+        // returns the map handle to caller
+        self.map = new google.maps.Map(app.view.getMapLocation(), {
+            center: self.default_location,
+            zoom: self.default_zoom,
+            mapTypeControl: false
+        });
+
+        self.places_svc = new google.maps.places.PlacesService(self.map);
+
+        self.infowindow = new google.maps.InfoWindow();
+        self.bounds = new google.maps.LatLngBounds();
+
+        // Setup initial locations
+        app.model.getDefaultLocations().forEach(function (descr) {
+            console.log(descr);
+            self.callback = self.setupLocation;
+            var request = {
+                location: self.default_location,
+                radius: '20000',
+                name: descr,
+            };
+            self.places_svc.nearbySearch(request, setupLocation);
+        });
+
+        // self.map.fitBounds(self.bounds);
+
+    }
+
+    return me;
+}(ko));
+
+
+app.view = (function ($, ko) {
+    'use strict';
+    var self = this;
+    var me = {
+        init: init,
+        getMapLocation: getMapLocation,
+        makeMarkerIcon: makeMarkerIcon
+    };
+
+    function init() {
+
     }
 
     // This function takes in a COLOR, and then creates a new marker
@@ -146,49 +176,29 @@ app.google = new function () {
         return markerImage;
     }
 
-// Performs asynchronous call to google maps places api
-    function findLocationByDescription(descr, callback) {
+    function getMapLocation() {
+        return $('#map')[0];
     }
+
+    return me;
+}(jQuery, ko));
+
+/*******************************************************************
+ * Google Map Code
+ *******************************************************************/
+
+app.google = new function () {
+    var self = this;
+    var me = {
+        initMap: initMap
+    };
 
 
 // Asynchronous callback from the google maps api
     function initMap() {
-        var elem = $('map');
-
         // Initialize the ViewModel
-        app.viewModel.init_app();
         ko.applyBindings(app.viewModel);
-
-        this.default_location = new google.maps.LatLng(self.default_location);
-
-        self.highlightedIcon = makeMarkerIcon('FFFF24');
-
-        // Creates a new map at the default location and inserts it into the page
-        // returns the map handle to caller
-        self.map = new google.maps.Map($('#map')[0], {
-            center: self.default_location,
-            zoom: self.default_zoom,
-            mapTypeControl: false
-        });
-
-        self.places_svc = new google.maps.places.PlacesService(self.map);
-
-        self.infowindow = new google.maps.InfoWindow();
-        self.bounds = new google.maps.LatLngBounds();
-
-        // Setup initial locations
-        self.default_locations.forEach(function (descr) {
-            console.log(descr);
-            self.callback = self.setupLocation;
-            var request = {
-                location: self.default_location,
-                radius: '20000',
-                name: descr,
-            };
-            self.places_svc.nearbySearch(request, setupLocation);
-        });
-
-        // self.map.fitBounds(self.bounds);
+        app.viewModel.init_app();
     }
 
     return me;
