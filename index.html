@@ -16,9 +16,10 @@
 <div id="container">
     <div id="options-box">
         <h1>Neighborhood Map</h1>
+        <h2 data-bind="text: self.hello"></h2>
         <div >
-            <ul data-bind="foreach: this.markers">
-                <li data-bind="text: $data.title"></li>
+            <ul data-bind="foreach: markers">
+                <li data-bind="text: $data.title">marker</li>
             </ul>
         </div>
     </div>
@@ -29,7 +30,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
 <script src="js/homepage.js"></script>
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAPQUBSBQep6puO1Ot_1ZGaf1pG-i0X55c&callback=app.google.initMap">
+        src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAPQUBSBQep6puO1Ot_1ZGaf1pG-i0X55c&callback=initMap">
 </script>
 
 </body>

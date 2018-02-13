@@ -1,19 +1,23 @@
-var app = window.app || {};
+// var app = window.app || {};
 
 // (function () {
+/*******************************************************************
+ * Google Map Code
+ *******************************************************************/
 
-app.model = (new function (ko) {
-    /*
-     * Latitude and Longitude of Brunswick Maine as returned by Google Maps
-     * https://maps.googleapis.com/maps/api/geocode/json?address=brunswick,me&key=KEY
-     */
+var initMap = function() {
+    // Initialize the ViewModel
+    ko.applyBindings(new ViewModel);
+};
+
+var stop = "Stop Here";
+
+
+var ViewModel = function () {
+    'use strict';
     var self = this;
-    var me = {
-        init: init,
-        getDefaultLocations: getDefaultLocations
-    };
 
-    default_locations = [
+    var default_locations = [
         "Hannafords",
         "Byrnes Irish Pub",
         "Benchwarmers",
@@ -28,24 +32,6 @@ app.model = (new function (ko) {
         "Bar"
     ];
 
-    function getDefaultLocations() {
-        return default_locations;
-    }
-
-    function init() {
-    }
-
-    return me;
-}(ko));
-
-app.viewModel = (new function (ko) {
-    'use strict';
-    var self = this;
-
-    var me = {
-        init_app: init_app
-    };
-
     this.map = null;
     this.places_svc = null;
     this.locations = [];
@@ -54,17 +40,12 @@ app.viewModel = (new function (ko) {
     this.markers.extend({rateLimit: 50});
 
     this.default_zoom = 13;
+    this.hello = ko.observable('hello');
 
     this.default_location = {
         lat: 43.9140162,
         lng: -69.96699599999999
     };
-
-    function init_app() {
-        app.model.init();
-        app.view.init();
-        init_map();
-    }
 
     // callback from google maps places api
     // Setup location markers and lists
@@ -114,11 +95,11 @@ app.viewModel = (new function (ko) {
     function init_map() {
         self.default_location = new google.maps.LatLng(self.default_location);
 
-        self.highlightedIcon = app.view.makeMarkerIcon('FFFF24');
+        self.highlightedIcon = makeMarkerIcon('FFFF24');
 
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
-        self.map = new google.maps.Map(app.view.getMapLocation(), {
+        self.map = new google.maps.Map(getMapLocation(), {
             center: self.default_location,
             zoom: self.default_zoom,
             mapTypeControl: false
@@ -130,7 +111,7 @@ app.viewModel = (new function (ko) {
         self.bounds = new google.maps.LatLngBounds();
 
         // Setup initial locations
-        app.model.getDefaultLocations().forEach(function (descr) {
+        default_locations.forEach(function (descr) {
             console.log(descr);
             self.callback = self.setupLocation;
             var request = {
@@ -142,23 +123,6 @@ app.viewModel = (new function (ko) {
         });
 
         // self.map.fitBounds(self.bounds);
-
-    }
-
-    return me;
-}(ko));
-
-
-app.view = (function ($, ko) {
-    'use strict';
-    var self = this;
-    var me = {
-        init: init,
-        getMapLocation: getMapLocation,
-        makeMarkerIcon: makeMarkerIcon
-    };
-
-    function init() {
 
     }
 
@@ -180,26 +144,8 @@ app.view = (function ($, ko) {
         return $('#map')[0];
     }
 
-    return me;
-}(jQuery, ko));
-
-/*******************************************************************
- * Google Map Code
- *******************************************************************/
-
-app.google = new function () {
-    var self = this;
-    var me = {
-        initMap: initMap
-    };
-
-
-// Asynchronous callback from the google maps api
-    function initMap() {
-        // Initialize the ViewModel
-        ko.applyBindings(app.viewModel);
-        app.viewModel.init_app();
-    }
-
-    return me;
+    init_map();
 };
+
+
+// })();
