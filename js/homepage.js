@@ -65,11 +65,11 @@ app.ViewModel = function () {
 
     }
 
-    // TODO: close any open infowindows
     function filterMarkers(filter) {
+        self.infowindow.close();
         self.visibleMarkers.removeAll();
         self.markers().forEach(function (marker) {
-            if (filter==='All' || marker.types.indexOf(filter) >= 0) {
+            if (filter === 'All' || marker.types.indexOf(filter) >= 0) {
                 marker.setVisible(true);
                 self.visibleMarkers.push(marker);
 
@@ -86,6 +86,11 @@ app.ViewModel = function () {
                 self.filterOptionsArray.push(elem);
             }
         });
+    }
+
+    // Handle clicks in the options location list
+    function listItemClicked() {
+        console.log(" Clicked!");
     }
 
     // callback from google maps places api
@@ -171,7 +176,7 @@ app.ViewModel = function () {
             var request = {
                 location: self.default_location,
                 radius: '20000',
-                name: descr,
+                name: descr
             };
             self.places_svc.nearbySearch(request, setupLocation);
         });

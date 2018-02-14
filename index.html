@@ -17,11 +17,12 @@
     <div id="options-box">
         <h1>Neighborhood Map</h1>
         <p>Map Filter: <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select></p>
-        <div >
-            <ul data-bind="foreach: visibleMarkers">
-                <li data-bind="text: $data.title">marker</li>
-            </ul>
-        </div>
+        <ul>
+            <li>First</li>
+            <!--  ko foreach: visibleMarkers -->
+            <li><a data-bind="click: $parent.listItemClicked, text: $data.title"></a></li></p>
+            <!-- /ko -->
+        </ul>
     </div>
 
     <div id="map" class="map"></div>
