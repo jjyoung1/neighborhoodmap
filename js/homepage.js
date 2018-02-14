@@ -5,7 +5,7 @@ var app = window.app || {};
  * Google Map Code
  *******************************************************************/
 
-app.initMap = function() {
+app.initMap = function () {
     // Initialize the ViewModel
     ko.applyBindings(new app.ViewModel);
 };
@@ -44,6 +44,8 @@ app.ViewModel = function () {
 
     this.markers = ko.observableArray([]);
     this.markers.extend({rateLimit: 50});
+    this.visibleMarkers = ko.observableArray([])
+    this.visibleMarkers.extend({rateLimit: 50});
 
     this.default_zoom = 13;
     this.hello = ko.observable('hello');
@@ -53,8 +55,8 @@ app.ViewModel = function () {
         lng: -69.96699599999999
     };
 
-    this.selectedFilterValue.subscribe(function(newValue, event) {
-        console.log('Filter Selected: '+newValue);
+    this.selectedFilterValue.subscribe(function (newValue, event) {
+        console.log('Filter Selected: ' + newValue);
         filterMarkers(newValue);
     });
 
@@ -63,11 +65,14 @@ app.ViewModel = function () {
 
     }
 
-    // TODO: close any open infowindows and apply filter to list
+    // TODO: close any open infowindows
     function filterMarkers(filter) {
-        self.markers().forEach(function(marker) {
-            if (marker.types.indexOf(filter) >= 0) {
-            marker.setVisible(true);
+        self.visibleMarkers.removeAll();
+        self.markers().forEach(function (marker) {
+            if (filter==='All' || marker.types.indexOf(filter) >= 0) {
+                marker.setVisible(true);
+                self.visibleMarkers.push(marker);
+
             } else {
                 marker.setVisible(false);
             }
@@ -75,9 +80,9 @@ app.ViewModel = function () {
     }
 
     // Populate the filter dropdown based on the types of markers returned from places
-    function populateFilterList(typeArray){
-        typeArray.forEach(function(elem){
-            if (self.filterOptionsArray.indexOf(elem) < 0){
+    function populateFilterList(typeArray) {
+        typeArray.forEach(function (elem) {
+            if (self.filterOptionsArray.indexOf(elem) < 0) {
                 self.filterOptionsArray.push(elem);
             }
         });
@@ -123,6 +128,8 @@ app.ViewModel = function () {
             });
 
             self.markers.push(marker);
+            self.visibleMarkers.push(marker);
+
             console.log("created Marker Title " + self.markers()[self.markers().length - 1].title);
         }
     }
