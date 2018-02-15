@@ -12,7 +12,7 @@ app.initMap = function () {
 
 var stop = "Stop Here";
 
-app.Foursquare = function(name) {
+app.Foursquare = function (name) {
     'use strict';
     var self = this;
 
@@ -24,7 +24,7 @@ app.Foursquare = function(name) {
 
     self.fsquery += name;
 
-    $.getJSON(self.fsquery, function(result){
+    $.getJSON(self.fsquery, function (result) {
         console.log(name);
         console.log(result);
 
@@ -37,19 +37,17 @@ app.ViewModel = function () {
     var self = this;
 
     var default_locations = [
-        "Hannafords",
-        "Byrnes Irish Pub",
-        "Benchwarmers",
-        "Frontier",
-        "Coast Bar + Bistro",
-        "Toasty's Tavern",
-        "Walmart",
-        "Little Dog",
-        "Lowes",
-        "Bowdoin College",
-        "School",
-        "Bar"
+        {title: "Hannaford Supermarket", location: {lat: 43.9118349, lng: -69.96696600000001}},
+        {title: "Byrnes Irish Pub", location: {lat: 43.91133, lng: -69.96522299999998}},
+        {title: "Benchwarmers", location: {lat: 43.9113643, lng: -69.96348669999998}},
+        {title: "Frontier", location: {lat: 43.919757, lng: -69.96693499999998}},
+        {title: "Coast Bar + Bistro", location: {lat: 43.9189497, lng: -69.9637538}},
+        {title: "Toasty's Tavern", location: {lat: 43.9100464, lng: -69.90944639999998}},
+        {title: "Walmart Supercenter", location: {lat: 43.9069916, lng: -69.90759509999998}},
+        {title: "Little Dog Coffee Shop", location: {lat: 43.9165556, lng: -69.96557439999998}},
+        {title: "Lowe's Home Improvement", location: {lat: 43.90817, lng: -69.90450299999998}}
     ];
+
 
     this.map = null;
     this.places_svc = null;
@@ -108,9 +106,9 @@ app.ViewModel = function () {
     }
 
     // Handle clicks in the options location list
-    this.listItemClicked = function(listItem) {
+    this.listItemClicked = function (listItem) {
         console.log(listItem.title + " Clicked!");
-    }
+    };
 
     // callback from google maps places api
     // Setup location markers and lists
@@ -125,6 +123,8 @@ app.ViewModel = function () {
                 title: results[0].name,
                 animation: google.maps.Animation.DROP
             });
+            console.log(results[0].name + ':' + results[0].geometry.location);
+
             // Add the location types for this marker to aid in filtering.
             marker.types = results[0].types;
             marker.foursquare = new app.Foursquare(results[0].name);
@@ -144,18 +144,27 @@ app.ViewModel = function () {
             marker.defaultIcon = marker.getIcon();
 
             marker.addListener('mouseover', function () {
-
+                if(self.infowindow.marker === marker)
+                    return;
+                resetMarkerIcons();
                 this.setIcon(self.highlightedIcon);
             });
 
             marker.addListener('mouseout', function () {
-                this.setIcon(this.defaultIcon);
+                resetMarkerIcons();
             });
 
             self.markers.push(marker);
             self.visibleMarkers.push(marker);
 
-            console.log("created Marker Title " + self.markers()[self.markers().length - 1].title);
+        }
+    }
+
+    function resetMarkerIcons() {
+        for (var i=0; i< self.markers().length; i++) {
+            if(self.infowindow.marker === self.markers()[i])
+                continue;
+            self.markers()[i].setIcon(self.defaultIcon);
         }
     }
 
@@ -166,6 +175,7 @@ app.ViewModel = function () {
             infowindow.open(map, marker);
             infowindow.addListener('closeclick', function () {
                 infowindow.marker = null;
+                resetMarkerIcons();
             });
         }
     }
@@ -190,13 +200,13 @@ app.ViewModel = function () {
         self.bounds = new google.maps.LatLngBounds();
 
         // Setup initial locations
-        default_locations.forEach(function (descr) {
-            console.log(descr);
+        default_locations.forEach(function (l) {
+            console.log(l.title);
             self.callback = self.setupLocation;
             var request = {
-                location: self.default_location,
-                radius: '20000',
-                name: descr
+                location: l.location,
+                radius: '100',  // Short radius since precise location specified
+                name: l.title
             };
             self.places_svc.nearbySearch(request, setupLocation);
         });
