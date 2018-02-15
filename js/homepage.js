@@ -12,6 +12,25 @@ app.initMap = function () {
 
 var stop = "Stop Here";
 
+app.Foursquare = function(name) {
+    'use strict';
+    var self = this;
+
+    // Initial string for query
+    self.fsquery = "https://api.foursquare.com/v2/venues/search?near=brunswick,maine&radius=5000&intent=match&" +
+        "client_id=OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG&" +
+        "client_secret=5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X&v=20170912&query=";
+    self.response = "";
+
+    self.fsquery += name;
+
+    $.getJSON(self.fsquery, function(result){
+        console.log(name);
+        console.log(result);
+
+    });
+};
+
 
 app.ViewModel = function () {
     'use strict';
@@ -89,8 +108,8 @@ app.ViewModel = function () {
     }
 
     // Handle clicks in the options location list
-    function listItemClicked() {
-        console.log(" Clicked!");
+    this.listItemClicked = function(listItem) {
+        console.log(listItem.title + " Clicked!");
     }
 
     // callback from google maps places api
@@ -108,6 +127,7 @@ app.ViewModel = function () {
             });
             // Add the location types for this marker to aid in filtering.
             marker.types = results[0].types;
+            marker.foursquare = new app.Foursquare(results[0].name);
 
             self.bounds.extend(marker.position);
             self.map.fitBounds(self.bounds);
