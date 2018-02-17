@@ -12,15 +12,13 @@
 </head>
 <body>
 
-<!-- Add your site or application content here -->
 <div id="container">
     <div id="options-box">
         <h1>Neighborhood Map</h1>
         <p>Map Filter: <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select></p>
         <ul>
-            <li>First</li>
-            <!--  ko foreach: visibleMarkers -->
-            <li><a data-bind="click: $parent.listItemClicked, text: $data.title"></a></li></p>
+            <!--  ko foreach: visibleLocations -->
+            <li><a data-bind="click: $parent.listItemClicked, text: $data.name"></a></li></p>
             <!-- /ko -->
         </ul>
     </div>

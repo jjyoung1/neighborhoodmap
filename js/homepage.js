@@ -27,10 +27,51 @@ app.Foursquare = function (name) {
     $.getJSON(self.fsquery, function (result) {
         console.log(name);
         console.log(result);
-
+    }).fail(function () {
+        console.log("Foursquare Query Failed")
     });
+    // TODO: Add error handling here
 };
 
+// Currently, this object will contain all of the information returned
+// from API calls.  This is done for developmental purpose.  This can be
+// optimized for memory footprint once all the required information is
+// extracted.
+app.Location = function (name, location) {
+    // name and location will be overriden by results of places search
+    this.name = ko.observable(name);
+    this.location = ko.observable(location);
+    this.place_info = ko.observable();
+    this.marker = ko.observable();
+    this.address = ko.observable();
+    this.foursquare = ko.observable();
+    this.defaultIcon = null;
+    this.hoverIcon = null;
+    this.clickedIcon = null;
+
+    this.getCategories = function () {
+        return this.place_info.types;
+    };
+
+    this.setIcon = function (icon) {
+        this.marker.setIcon(icon);
+    };
+
+    this.setVisible = function (visible) {
+        this.marker.setVisible(visible)
+    };
+
+    this.isVisible = function () {
+        return this.marker.getVisible();
+    };
+
+    // Check if location is of the specified type
+    this.isType = function (type) {
+
+        var index = this.place_info.types.indexOf(type)
+        return index >= 0;
+    };
+};
 
 app.ViewModel = function () {
     'use strict';
@@ -51,7 +92,6 @@ app.ViewModel = function () {
 
     this.map = null;
     this.places_svc = null;
-    this.locations = [];
 
     // filterSet is used to combine the place types for all the markers
     // filterOptionsArray is created from a filterSet since ko doesn't have an observable Set type
@@ -59,46 +99,43 @@ app.ViewModel = function () {
     this.filterOptionsArray = ko.observableArray(['All']);
     this.selectedFilterValue = ko.observable(this.filterOptionsArray[0]);
 
-    this.markers = ko.observableArray([]);
-    this.markers.extend({rateLimit: 50});
-    this.visibleMarkers = ko.observableArray([])
-    this.visibleMarkers.extend({rateLimit: 50});
+    // Setup subscription for filter list
+    this.selectedFilterValue.subscribe(function (newValue, event) {
+        console.log('Filter Selected: ' + newValue);
+        filterLocations(newValue);
+    });
+
+
+    this.locations = ko.observableArray([]);
+    this.locations.extend({rateLimit: 50});
+    this.visibleLocations = ko.observableArray([]);
+    this.visibleLocations.extend({rateLimit: 50});
 
     this.default_zoom = 13;
-    this.hello = ko.observable('hello');
 
     this.default_location = {
         lat: 43.9140162,
         lng: -69.96699599999999
     };
 
-    this.selectedFilterValue.subscribe(function (newValue, event) {
-        console.log('Filter Selected: ' + newValue);
-        filterMarkers(newValue);
-    });
-
-    // Check if marker is the specified type
-    function isMarkerType(type) {
-
-    }
-
-    function filterMarkers(filter) {
+    function filterLocations(filter) {
         self.infowindow.close();
-        self.visibleMarkers.removeAll();
-        self.markers().forEach(function (marker) {
-            if (filter === 'All' || marker.types.indexOf(filter) >= 0) {
-                marker.setVisible(true);
-                self.visibleMarkers.push(marker);
-
+        self.visibleLocations.removeAll();
+        self.locations().forEach(function (location) {
+            if (filter === 'All' || location.isType(filter)) {
+                location.setVisible(true);
+                self.visibleLocations.push(location);
             } else {
-                marker.setVisible(false);
+                location.setVisible(false);
             }
         });
     }
 
-    // Populate the filter dropdown based on the types of markers returned from places
+    // Add the contents of the type array to the filter options
     function populateFilterList(typeArray) {
         typeArray.forEach(function (elem) {
+
+            // Only enter a type if it's not already present (no duplicates allowed)
             if (self.filterOptionsArray.indexOf(elem) < 0) {
                 self.filterOptionsArray.push(elem);
             }
@@ -107,44 +144,35 @@ app.ViewModel = function () {
 
     // Handle clicks in the options location list
     this.listItemClicked = function (listItem) {
-        console.log(listItem.title + " Clicked!");
+        console.log(listItem.name() + " Clicked!");
     };
 
     // callback from google maps places api
     // Setup location markers and lists
     function setupLocation(results, status) {
-        var marker;
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-            self.locations.push(results);
+            var loc = new app.Location(results[0].name, results[0].geometry.location);
 
-            marker = new google.maps.Marker({
+            console.log(results[0].name + ':' + results[0].geometry.location);
+
+            loc.place_info = results[0];
+
+            // Create marker
+            var marker = new google.maps.Marker({
                 position: results[0].geometry.location,
                 map: self.map,
                 title: results[0].name,
                 animation: google.maps.Animation.DROP
             });
-            console.log(results[0].name + ':' + results[0].geometry.location);
 
-            // Add the location types for this marker to aid in filtering.
-            marker.types = results[0].types;
-            marker.foursquare = new app.Foursquare(results[0].name);
-
-            self.bounds.extend(marker.position);
-            self.map.fitBounds(self.bounds);
-
-            populateFilterList(marker.types);
-
+            // Setup marker behavior
             marker.addListener('click', function () {
                 populateInfoWindow(this, self.infowindow);
                 this.setIcon(self.clickedIcon);
             });
 
-            //
-            marker.redIcon = marker.getIcon();
-            marker.defaultIcon = marker.getIcon();
-
             marker.addListener('mouseover', function () {
-                if(self.infowindow.marker === marker)
+                if (self.infowindow.marker === marker)
                     return;
                 resetMarkerIcons();
                 this.setIcon(self.highlightedIcon);
@@ -154,29 +182,55 @@ app.ViewModel = function () {
                 resetMarkerIcons();
             });
 
-            self.markers.push(marker);
-            self.visibleMarkers.push(marker);
+            // Save marker in location
+            loc.marker = marker;
 
+            // Get information from Foursquare.  The callback function will store
+            // it into the location object
+            app.Foursquare(loc);
+
+            self.bounds.extend(marker.position);
+            self.map.fitBounds(self.bounds);
+
+            populateFilterList(loc.place_info.types);
+
+            // Save default icon used by the marker
+            loc.defaultIcon = marker.getIcon();
+
+            // TODO self.markers.push(marker);
+            // self.visibleMarkers.push(marker);
+
+            // Add constructed location to the list of locations
+            self.locations.push(loc);
+            self.visibleLocations.push(loc);
+        }
+    }
+
+    function findLocationForMarker(marker) {
+        for (var i = 0; i < self.locations().length; i++) {
+            if (self.locations()[i].marker === marker)
+                return self.locations()[i];
         }
     }
 
     function resetMarkerIcons() {
-        for (var i=0; i< self.markers().length; i++) {
-            if(self.infowindow.marker === self.markers()[i])
-                continue;
-            self.markers()[i].setIcon(self.defaultIcon);
+        for (var i = 0; i < self.locations().length; i++) {
+            // Reset icon for markers without an open infowindow
+            if (self.infowindow.marker !== self.locations()[i].marker)
+                self.locations()[i].setIcon(self.defaultIcon);
         }
     }
 
     function populateInfoWindow(marker, infowindow) {
         if (infowindow.marker != marker) {
+            var loc = findLocationForMarker(marker);
             infowindow.marker = marker;
-            infowindow.setContent('<div>' + marker.title + '</div>');
+            infowindow.setContent('<div>' + loc.name() + '</div>');
             infowindow.open(map, marker);
             infowindow.addListener('closeclick', function () {
                 infowindow.marker = null;
                 resetMarkerIcons();
-            });
+            })
         }
     }
 
@@ -199,10 +253,9 @@ app.ViewModel = function () {
         self.infowindow = new google.maps.InfoWindow();
         self.bounds = new google.maps.LatLngBounds();
 
-        // Setup initial locations
+        // Setup initial locations...initiate using a Google Places search for each location
         default_locations.forEach(function (l) {
             console.log(l.title);
-            self.callback = self.setupLocation;
             var request = {
                 location: l.location,
                 radius: '100',  // Short radius since precise location specified
@@ -210,8 +263,6 @@ app.ViewModel = function () {
             };
             self.places_svc.nearbySearch(request, setupLocation);
         });
-
-
     }
 
     // This function takes in a COLOR, and then creates a new marker
