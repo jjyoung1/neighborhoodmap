@@ -12,21 +12,23 @@ app.initMap = function () {
 
 var stop = "Stop Here";
 
-app.Foursquare = function (name) {
+app.Foursquare = function (loc) {
     'use strict';
     var self = this;
+    var name = loc.name;
+    var latlng = loc.location;
 
     // Initial string for query
     self.fsquery = "https://api.foursquare.com/v2/venues/search?near=brunswick,maine&radius=5000&intent=match&" +
         "client_id=OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG&" +
-        "client_secret=5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X&v=20170912&query=";
+        "client_secret=5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X&v=20170912";
     self.response = "";
 
-    self.fsquery += name;
+    self.fsquery += "&query=" + name ;
 
     $.getJSON(self.fsquery, function (result) {
-        console.log(name);
-        console.log(result);
+        console.log("4Sq Result: "  + result.toString());
+        // console.log(self.result);
     }).fail(function () {
         console.log("Foursquare Query Failed")
     });
@@ -70,6 +72,20 @@ app.Location = function (name, location) {
 
         var index = this.place_info.types.indexOf(type)
         return index >= 0;
+    };
+
+    this.startBounce = function() {
+        // if (this.marker.getAnimation() !== null) {
+        //     this.marker.setAnimation(null);
+        // } else {
+            this.marker.setAnimation(google.maps.Animation.BOUNCE);
+        // }
+        setTimeout(this.stopBounce, 2000, this);
+
+    };
+
+    this.stopBounce = function(loc) {
+        loc.marker.setAnimation(null);
     };
 };
 
@@ -153,7 +169,7 @@ app.ViewModel = function () {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
             var loc = new app.Location(results[0].name, results[0].geometry.location);
 
-            console.log(results[0].name + ':' + results[0].geometry.location);
+            console.log("LocSetup: " + results[0].name + ':' + results[0].geometry.location);
 
             loc.place_info = results[0];
 
@@ -166,10 +182,13 @@ app.ViewModel = function () {
             });
 
             // Setup marker behavior
-            marker.addListener('click', function () {
-                populateInfoWindow(this, self.infowindow);
-                this.setIcon(self.clickedIcon);
-            });
+            marker.addListener('click', function (loc) {
+                return function() {
+                    populateInfoWindow(this, self.infowindow);
+                    loc.setIcon(self.clickedIcon);
+                    loc.startBounce();
+                }
+            }(loc));
 
             marker.addListener('mouseover', function () {
                 if (self.infowindow.marker === marker)
