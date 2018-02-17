@@ -12,22 +12,25 @@ app.initMap = function () {
 
 var stop = "Stop Here";
 
-app.Foursquare = function (loc) {
+app.Foursquare = function (loc, def_loc) {
     'use strict';
     var self = this;
-    var name = loc.name;
-    var latlng = loc.location;
+    var name = loc.name();
+    var latlng = loc.location();
+
 
     // Initial string for query
-    self.fsquery = "https://api.foursquare.com/v2/venues/search?near=brunswick,maine&radius=5000&intent=match&" +
-        "client_id=OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG&" +
-        "client_secret=5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X&v=20170912";
-    self.response = "";
+    var apiURL = "https://api.foursquare.com/v2/venues/";
+    var clientID = "OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG";
+    var clientSecret = "5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X";
+    var version = "20170912";
+    var venueID = "4ac238e5f964a520489820e3";
 
-    self.fsquery += "&query=" + name ;
+    var url = apiURL + def_loc.fsq_id + '?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=' + version;
 
-    $.getJSON(self.fsquery, function (result) {
-        console.log("4Sq Result: "  + result.toString());
+    $.getJSON(url, function (result) {
+        loc.fsq_venue(result.response.venue);
+        console.log("4Sq Result name: "  + loc.fsq_venue().name + " phone: " + loc.fsq_venue().contact.formattedPhone);
         // console.log(self.result);
     }).fail(function () {
         console.log("Foursquare Query Failed")
@@ -47,6 +50,8 @@ app.Location = function (name, location) {
     this.marker = ko.observable();
     this.address = ko.observable();
     this.foursquare = ko.observable();
+    this.fsq_venue = ko.observable();
+    this.fsq_venue_id = ko.observable();
     this.defaultIcon = null;
     this.hoverIcon = null;
     this.clickedIcon = null;
@@ -94,15 +99,16 @@ app.ViewModel = function () {
     var self = this;
 
     var default_locations = [
-        {title: "Hannaford Supermarket", location: {lat: 43.9118349, lng: -69.96696600000001}},
-        {title: "Byrnes Irish Pub", location: {lat: 43.91133, lng: -69.96522299999998}},
-        {title: "Benchwarmers", location: {lat: 43.9113643, lng: -69.96348669999998}},
-        {title: "Frontier", location: {lat: 43.919757, lng: -69.96693499999998}},
-        {title: "Coast Bar + Bistro", location: {lat: 43.9189497, lng: -69.9637538}},
-        {title: "Toasty's Tavern", location: {lat: 43.9100464, lng: -69.90944639999998}},
-        {title: "Walmart Supercenter", location: {lat: 43.9069916, lng: -69.90759509999998}},
-        {title: "Little Dog Coffee Shop", location: {lat: 43.9165556, lng: -69.96557439999998}},
-        {title: "Lowe's Home Improvement", location: {lat: 43.90817, lng: -69.90450299999998}}
+        {title: "Wild Oats Bakery & Cafe", location: {lat: 43.9149431, lng: -69.9660507}, fsq_id: "4b9e6089f964a5203bde36e3"},
+        {title: "Tao Yuan Restaurant", location: {lat: 43.914225, lng: -69.969562}, fsq_id: "4fb6c7f4e4b094ed55f49309"},
+        {title: "Frontier", location: {lat: 43.9197608, lng: -69.969129}, fsq_id: "4ac238e5f964a520489820e3"},
+        {title: "Frosty's Donuts & Coffee Shop", location: {lat: 43.917573, lng: -69.9689393}, fsq_id: "4c2b1dbe57a9c9b6815cf567"},
+        {title: "Five Guys", location: {lat: 43.9068938, lng: -69.921544}, fsq_id: "51b74f4f498e4f3e65477d99"},
+        {title: "Fat Boy Drive-In\n", location: {lat: 43.9071104, lng: -69.9357459}, fsq_id: "4ba39203f964a520444838e3"},
+        {title: "Bangkok Garden", location: {lat: 43.9192555, lng: -69.9698779}, fsq_id: "4c41087eda3dc928515cc8b9"},
+        {title: "Scarlet Begonias", location: {lat: 43.911486, lng: -69.9672573}, fsq_id: "4ba13593f964a52051a237e3"},
+        {title: "Gurnet Trading Co", location: {lat: 43.8653359, lng: -69.9163381}, fsq_id: "4bc0ce1a920eb713c79a192c"},
+        {title: "Big Top Deli", location: {lat: 43.9170172, lng: -69.9686964}, fsq_id: "4b4fb392f964a520851127e3"}
     ];
 
 
@@ -165,7 +171,7 @@ app.ViewModel = function () {
 
     // callback from google maps places api
     // Setup location markers and lists
-    function setupLocation(results, status) {
+    function setupLocation(results, status, def_loc) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
             var loc = new app.Location(results[0].name, results[0].geometry.location);
 
@@ -206,7 +212,7 @@ app.ViewModel = function () {
 
             // Get information from Foursquare.  The callback function will store
             // it into the location object
-            app.Foursquare(loc);
+            app.Foursquare(loc, def_loc);
 
             self.bounds.extend(marker.position);
             self.map.fitBounds(self.bounds);
@@ -223,6 +229,12 @@ app.ViewModel = function () {
             self.locations.push(loc);
             self.visibleLocations.push(loc);
         }
+    }
+
+    // Interrogates the Google Map Places API and Foursquare
+    function buildLocation(loc) {
+
+
     }
 
     function findLocationForMarker(marker) {
@@ -280,8 +292,15 @@ app.ViewModel = function () {
                 radius: '100',  // Short radius since precise location specified
                 name: l.title
             };
-            self.places_svc.nearbySearch(request, setupLocation);
+
+            self.places_svc.nearbySearch(request, function(def_loc){
+                return function(results,status) {
+                    setupLocation(results, status, def_loc);
+                }
+            }(l));
+
         });
+
     }
 
     // This function takes in a COLOR, and then creates a new marker
