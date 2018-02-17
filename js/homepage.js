@@ -56,7 +56,9 @@ app.Location = function (name, location) {
     this.hoverIcon = null;
     this.clickedIcon = null;
     this.phone = function () {
-        return this.fsq_venue().contact.formattedPhone;
+        if (this.fsq_venue().contact)
+            return this.fsq_venue().contact.formattedPhone;
+        return null;
     };
 
     this.description = function () {
@@ -68,11 +70,15 @@ app.Location = function (name, location) {
     };
 
     this.hours = function () {
-        return this.fsq_venue().hours.status
+        if (this.fsq_venue().hours)
+            return this.fsq_venue().hours.status;
+        return null;
     };
 
     this.price_tier = function () {
-        return this.fsq_venue().price.message;
+        if (this.fsq_venue().price)
+            return this.fsq_venue().price.message;
+        return null;
     };
 
 
