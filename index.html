@@ -15,11 +15,14 @@
 <div id="container">
     <div id="options-box">
         <h1>Neighborhood Map</h1>
-        <p>Map Filter: <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select></p>
-        <ul>
-            <!--  ko foreach: visibleLocations -->
-            <li><a data-bind="click: $parent.listItemClicked, text: $data.name"></a></li></p>
-            <!-- /ko -->
+        <ul id="top_menu">
+            <li>Map Filter: <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select></li>
+            <li>Locations</li>
+            <ul id="loc_menu">
+                <!--  ko foreach: visibleLocations -->
+                <li><a data-bind="click: $parent.listItemClicked, text: $data.name"></a></li>
+                <!-- /ko -->
+            </ul>
         </ul>
     </div>
 
