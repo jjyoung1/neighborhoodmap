@@ -157,12 +157,23 @@ app.ViewModel = function () {
     // filterOptionsArray is created from a filterSet since ko doesn't have an observable Set type
     this.filterSet = new Set();
     this.filterOptionsArray = ko.observableArray(['All']);
-    this.selectedFilterValue = ko.observable(this.filterOptionsArray[0]);
+    this.selectedFilterValue = ko.observable();
+
 
     // Setup subscription for filter list
     this.selectedFilterValue.subscribe(function (newValue, event) {
         console.log('Filter Selected: ' + newValue);
         filterLocations(newValue);
+    });
+
+    this.selectedLocation = ko.observable(this.visibleLocations);
+
+    this.selectedLocation.subscribe(function(loc, event) {
+        if (loc)
+            self.listItemClicked(loc);
+        else
+            self.infowindow.close();
+
     });
 
 

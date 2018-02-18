@@ -18,14 +18,26 @@
     </div>
     <div class="nav">
         <ul class="menu">
-            <li>Map Filter: <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select>
+            <li>Map Filter <select data-bind="options: filterOptionsArray, value: selectedFilterValue"></select>
             </li>
-            <li>Locations</li>
-            <ul id="loc_menu">
-                <!--  ko foreach: visibleLocations -->
-                <li><a data-bind="click: $parent.listItemClicked, text: $data.name"></a></li>
-                <!-- /ko -->
-            </ul>
+
+            <div id="select_locations">
+                <li>Locations <select data-bind="options: visibleLocations,
+                                                 optionsText: 'name',
+                                                 value: selectedLocation,
+                                                 optionsCaption: 'Select a Location...'">
+
+                </select>
+                </li>
+            </div>
+            <div id="list_locations">
+                <li>Locations</li>
+                <ul id="loc_menu">
+                    <!--  ko foreach: visibleLocations -->
+                    <li><a data-bind="click: $parent.listItemClicked, text: $data.name"></a></li>
+                    <!-- /ko -->
+                </ul>
+            </div>
         </ul>
     </div>
 </div>
