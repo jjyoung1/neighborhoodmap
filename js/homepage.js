@@ -207,8 +207,8 @@ app.ViewModel = function () {
         var marker = loc.marker;
 
         populateInfoWindow(marker, self.infowindow);
-        loc.setIcon(self.clickedIcon);
         resetMarkerIcons();
+        loc.setIcon(self.clickedIcon);
         loc.startBounce();
         console.log(loc.name() + " Clicked!");
     };
@@ -294,8 +294,8 @@ app.ViewModel = function () {
         if (infowindow.marker !== marker) {
             var loc = findLocationForMarker(marker);
             infowindow.marker = marker;
-            var content = '<div id="ifw">';
-            content += '<h1>' + loc.name() + '</h1>';
+            var content = '<div id="ifw" class="ifw">';
+            content += '<h1 class="ifw-title">' + loc.name() + '</h1>';
             if (loc.phone())
                 content += '<p>Phone: ' + loc.phone() + '</p>';
             if (loc.description())
@@ -313,6 +313,7 @@ app.ViewModel = function () {
             // };
 
             infowindow.setContent(content);
+            resetMarkerIcons();
             infowindow.open(map, marker);
             infowindow.addListener('closeclick', function () {
                 infowindow.marker = null;
@@ -337,7 +338,7 @@ app.ViewModel = function () {
 
         self.places_svc = new google.maps.places.PlacesService(self.map);
 
-        self.infowindow = new google.maps.InfoWindow();
+        self.infowindow = new google.maps.InfoWindow({});
         self.bounds = new google.maps.LatLngBounds();
 
         // Setup initial locations...initiate using a Google Places search for each location

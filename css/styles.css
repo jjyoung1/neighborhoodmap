@@ -63,6 +63,7 @@ html, body {
 .menu  a{
     color: royalblue;
 }
+
 .map {
     margin: 2px;
     bottom: 0;
@@ -82,4 +83,27 @@ body {
     height: 100%;
     min-height: 100%;
     background: lightgoldenrodyellow;
+}
+
+#ifw {
+    margin: 0;
+    padding: 0;
+}
+#ifw .ifw-title {
+    background: lightblue;
+    color: darkblue;
+}
+
+.gm-style-iw {
+    width: 350px !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 2px 2px 0 0;
+    margin: 2px;
+}
+
+@media (max-width: 400px) {
+    .gm-style-iw {
+        max-width: 200px;
+    }
 }
