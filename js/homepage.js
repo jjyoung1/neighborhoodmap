@@ -207,7 +207,8 @@ app.ViewModel = function () {
         var marker = loc.marker;
 
         populateInfoWindow(marker, self.infowindow);
-        marker.setIcon(loc.clickedIcon);
+        loc.setIcon(self.clickedIcon);
+        resetMarkerIcons();
         loc.startBounce();
         console.log(loc.name() + " Clicked!");
     };
