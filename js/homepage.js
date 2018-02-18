@@ -203,8 +203,13 @@ app.ViewModel = function () {
     }
 
     // Handle clicks in the options location list
-    this.listItemClicked = function (listItem) {
-        console.log(listItem.name() + " Clicked!");
+    this.listItemClicked = function (loc) {
+        var marker = loc.marker;
+
+        populateInfoWindow(marker, self.infowindow);
+        marker.setIcon(loc.clickedIcon);
+        loc.startBounce();
+        console.log(loc.name() + " Clicked!");
     };
 
     // callback from google maps places api
