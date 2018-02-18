@@ -7,38 +7,64 @@ html, body {
     padding: 0;
 }
 
-#container {
+.container {
     display: flex;
     flex-flow: row wrap;
     margin: auto;
     height: 100%;
 }
 
-#container > * {
+.container > * {
+    padding: 10px;
     flex: 1 100%;
 }
 
-#options-box {
-    /*flex: initial;*/
-    flex: initial;
-    flex-wrap: wrap;
-    flex-basis: auto;
-    background: #fff;
-    border: 1px solid #999;
-    border-radius: 3px;
-    line-height: 35px;
-    padding: 10px 10px 30px 10px;
-    text-align: left;
-    /*margin: 20px 20px 0px 20px;*/
-    margin: auto;
-    margin-top: 5px;
+.container div {
+    flex: 1;
 }
 
-#options-box > h1 {
+.content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: 2px;
+    border-color: darkblue;
+    border: 2px;
+}
+.header {
+    margin: 0;
+    padding: 0;
+}
+.header  h1 {
     text-align: center;
+    background: lightblue;
+    color: darkblue;
+    margin: 0;
 }
 
-#map {
+.nav {
+    margin: 0;
+    padding: 0;
+    background: lightyellow;
+    color: darkblue;
+}
+
+.menu {
+
+}
+
+.menu li {
+    list-style: none;
+}
+
+.loc {
+
+}
+.menu  a{
+    color: royalblue;
+}
+.map {
+    margin: 2px;
     bottom: 0;
     height: 100%;
     flex: 1;
@@ -47,4 +73,13 @@ html, body {
     min-width: 70%;
     max-width: 100%;
     width: 100%;
+}
+
+body {
+    display: flex;
+    flex-flow: row wrap;
+    margin: auto;
+    height: 100%;
+    min-height: 100%;
+    background: lightgoldenrodyellow;
 }
