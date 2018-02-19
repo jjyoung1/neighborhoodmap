@@ -145,7 +145,7 @@ app.ViewModel = function () {
         },
         {title: "Bangkok Garden", location: {lat: 43.9192555, lng: -69.9698779}, fsq_id: "4c41087eda3dc928515cc8b9"},
         {title: "Scarlet Begonias", location: {lat: 43.911486, lng: -69.9672573}, fsq_id: "4ba13593f964a52051a237e3"},
-        {title: "Gurnet Trading Co", location: {lat: 43.8653359, lng: -69.9163381}, fsq_id: "4bc0ce1a920eb713c79a192c"},
+        // {title: "Gurnet Trading Co", location: {lat: 43.8653359, lng: -69.9163381}, fsq_id: "4bc0ce1a920eb713c79a192c"},
         {title: "Big Top Deli", location: {lat: 43.9170172, lng: -69.9686964}, fsq_id: "4b4fb392f964a520851127e3"}
     ];
 

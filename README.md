@@ -5,3 +5,4 @@
 * [knockout.js](http://knockoutjs.com/)
 * Style code from ud864 for .options-box and #map
 * [5 ways to customize Google Maps InfoWindow](http://en.marnoto.com/2014/09/5-formas-de-personalizar-infowindow.html)
+* [Detecting when Flex Wrap has occurred](https://stackoverflow.com/questions/40012428/how-to-detect-css-flex-wrap-event)
