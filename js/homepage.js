@@ -1,17 +1,11 @@
 var app = window.app || {};
 
-// (function () {
-/*******************************************************************
- * Google Map Code
- *******************************************************************/
-
 app.initMap = function () {
     // Initialize the ViewModel
     ko.applyBindings(new app.ViewModel);
 };
 
-var stop = "Stop Here";
-
+//
 app.Foursquare = function (loc, def_loc) {
     'use strict';
     var self = this;
@@ -24,7 +18,6 @@ app.Foursquare = function (loc, def_loc) {
     var clientID = "OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG";
     var clientSecret = "5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X";
     var version = "20170912";
-    var venueID = "4ac238e5f964a520489820e3";
 
     var url = apiURL + def_loc.fsq_id + '?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=' + version;
 
@@ -33,13 +26,12 @@ app.Foursquare = function (loc, def_loc) {
         console.log("4Sq Result name: " + loc.fsq_venue().name + " phone: " + loc.fsq_venue().contact.formattedPhone);
         // console.log(self.result);
     }).fail(function () {
-        console.log("Foursquare Query Failed")
+        alert("Foursquare Query Failed")
     });
-    // TODO: Add error handling here
 };
 
 // Currently, this object will contain all of the information returned
-// from API calls.  This is done for developmental purpose.  This can be
+// from API calls. This can be
 // optimized for memory footprint once all the required information is
 // extracted.
 app.Location = function (name, location) {
@@ -48,12 +40,10 @@ app.Location = function (name, location) {
     this.location = ko.observable(location);
     this.place_info = ko.observable();
     this.marker = ko.observable();
-    this.address = ko.observable();
     this.foursquare = ko.observable();
     this.fsq_venue = ko.observable();
     this.fsq_venue_id = ko.observable();
     this.defaultIcon = null;
-    this.hoverIcon = null;
     this.clickedIcon = null;
     this.phone = function () {
         if (this.fsq_venue().contact)
@@ -125,27 +115,14 @@ app.ViewModel = function () {
     var self = this;
 
     var default_locations = [
-        {
-            title: "Wild Oats Bakery & Cafe",
-            location: {lat: 43.9149431, lng: -69.9660507},
-            fsq_id: "4b9e6089f964a5203bde36e3"
-        },
+        {title: "Wild Oats Bakery & Cafe", location: {lat: 43.9149431, lng: -69.9660507}, fsq_id: "4b9e6089f964a5203bde36e3"},
         {title: "Tao Yuan Restaurant", location: {lat: 43.914225, lng: -69.969562}, fsq_id: "4fb6c7f4e4b094ed55f49309"},
         {title: "Frontier", location: {lat: 43.9197608, lng: -69.969129}, fsq_id: "4ac238e5f964a520489820e3"},
-        {
-            title: "Frosty's Donuts & Coffee Shop",
-            location: {lat: 43.917573, lng: -69.9689393},
-            fsq_id: "4c2b1dbe57a9c9b6815cf567"
-        },
+        {title: "Frosty's Donuts & Coffee Shop", location: {lat: 43.917573, lng: -69.9689393}, fsq_id: "4c2b1dbe57a9c9b6815cf567"},
         {title: "Five Guys", location: {lat: 43.9068938, lng: -69.921544}, fsq_id: "51b74f4f498e4f3e65477d99"},
-        {
-            title: "Fat Boy Drive-In\n",
-            location: {lat: 43.9071104, lng: -69.9357459},
-            fsq_id: "4ba39203f964a520444838e3"
-        },
+        {title: "Fat Boy Drive-In\n", location: {lat: 43.9071104, lng: -69.9357459}, fsq_id: "4ba39203f964a520444838e3"},
         {title: "Bangkok Garden", location: {lat: 43.9192555, lng: -69.9698779}, fsq_id: "4c41087eda3dc928515cc8b9"},
         {title: "Scarlet Begonias", location: {lat: 43.911486, lng: -69.9672573}, fsq_id: "4ba13593f964a52051a237e3"},
-        // {title: "Gurnet Trading Co", location: {lat: 43.8653359, lng: -69.9163381}, fsq_id: "4bc0ce1a920eb713c79a192c"},
         {title: "Big Top Deli", location: {lat: 43.9170172, lng: -69.9686964}, fsq_id: "4b4fb392f964a520851127e3"}
     ];
 
@@ -153,9 +130,6 @@ app.ViewModel = function () {
     this.map = null;
     this.places_svc = null;
 
-    // filterSet is used to combine the place types for all the markers
-    // filterOptionsArray is created from a filterSet since ko doesn't have an observable Set type
-    this.filterSet = new Set();
     this.filterOptionsArray = ko.observableArray(['All']);
     this.selectedFilterValue = ko.observable();
 
@@ -167,15 +141,12 @@ app.ViewModel = function () {
     });
 
     this.selectedLocation = ko.observable(this.visibleLocations);
-
     this.selectedLocation.subscribe(function(loc, event) {
         if (loc)
             self.listItemClicked(loc);
         else
             self.infowindow.close();
-
     });
-
 
     this.locations = ko.observableArray([]);
     this.locations.extend({rateLimit: 50});
@@ -183,12 +154,12 @@ app.ViewModel = function () {
     this.visibleLocations.extend({rateLimit: 50});
 
     this.default_zoom = 13;
-
     this.default_location = {
         lat: 43.9140162,
         lng: -69.96699599999999
     };
 
+    // Recreate the array of locations to be displayed based on the filter selection
     function filterLocations(filter) {
         self.infowindow.close();
         self.visibleLocations.removeAll();
@@ -202,7 +173,7 @@ app.ViewModel = function () {
         });
     }
 
-    // Add the contents of the type array to the filter options
+    // Add the contents of the location type array to the list of filter options
     function populateFilterList(typeArray) {
         typeArray.forEach(function (elem) {
 
@@ -269,16 +240,15 @@ app.ViewModel = function () {
             // it into the location object
             app.Foursquare(loc, def_loc);
 
+            // Scale the map to include this location
             self.bounds.extend(marker.position);
             self.map.fitBounds(self.bounds);
 
+            // Add the location type information to the filter list
             populateFilterList(loc.place_info.types);
 
             // Save default icon used by the marker
             loc.defaultIcon = marker.getIcon();
-
-            // TODO self.markers.push(marker);
-            // self.visibleMarkers.push(marker);
 
             // Add constructed location to the list of locations
             self.locations.push(loc);
@@ -317,11 +287,8 @@ app.ViewModel = function () {
                 content += '<p>' + loc.hours() + '</p>';
             if (loc.price_tier())
                 content += '<p>Price: ' + loc.price_tier() + '</p>';
+            content += "<p>Powered by Foursquare</p>";
             content += '</div>';
-
-            // this.getCategories = function () {
-            //     return this.place_info.types;
-            // };
 
             infowindow.setContent(content);
             resetMarkerIcons();
@@ -391,6 +358,3 @@ app.ViewModel = function () {
 
     init_map();
 };
-
-
-// })();
