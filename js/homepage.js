@@ -2,7 +2,7 @@ var app = window.app || {};
 
 app.initMap = function () {
     // Initialize the ViewModel
-    ko.applyBindings(new app.ViewModel);
+    ko.applyBindings(new app.ViewModel());
 };
 
 //
@@ -26,7 +26,7 @@ app.Foursquare = function (loc, def_loc) {
         console.log("4Sq Result name: " + loc.fsq_venue().name + " phone: " + loc.fsq_venue().contact.formattedPhone);
         // console.log(self.result);
     }).fail(function () {
-        alert("Foursquare Query Failed")
+        alert("Foursquare Query Failed");
     });
 };
 
@@ -81,7 +81,7 @@ app.Location = function (name, location) {
     };
 
     this.setVisible = function (visible) {
-        this.marker.setVisible(visible)
+        this.marker.setVisible(visible);
     };
 
     this.isVisible = function () {
@@ -91,7 +91,7 @@ app.Location = function (name, location) {
     // Check if location is of the specified type
     this.isType = function (type) {
 
-        var index = this.place_info.types.indexOf(type)
+        var index = this.place_info.types.indexOf(type);
         return index >= 0;
     };
 
@@ -219,7 +219,7 @@ app.ViewModel = function () {
                     populateInfoWindow(this, self.infowindow);
                     loc.setIcon(self.clickedIcon);
                     loc.startBounce();
-                }
+                };
             }(loc));
 
             marker.addListener('mouseover', function () {
@@ -296,7 +296,7 @@ app.ViewModel = function () {
             infowindow.addListener('closeclick', function () {
                 infowindow.marker = null;
                 resetMarkerIcons();
-            })
+            });
         }
     }
 
@@ -331,7 +331,7 @@ app.ViewModel = function () {
             self.places_svc.nearbySearch(request, function (def_loc) {
                 return function (results, status) {
                     setupLocation(results, status, def_loc);
-                }
+                };
             }(l));
 
         });
