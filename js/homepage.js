@@ -1,8 +1,8 @@
 var app = window.app || {};
 
 app.initMap = function () {
-    // Initialize the ViewModel
-    ko.applyBindings(new app.ViewModel(), document.getElementById('nav'));
+    // Initialize the viewModel
+    ko.applyBindings(new app.viewModel(), document.getElementById('nav'));
 };
 
 app.errorModel = new function () {
@@ -131,7 +131,7 @@ app.Location = function (name, location) {
     };
 };
 
-app.ViewModel = function () {
+app.viewModel = function () {
     'use strict';
     var self = this;
 
