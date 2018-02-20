@@ -72,10 +72,14 @@ html, body {
     height: 100%;
     flex: 1;
     flex-wrap: wrap;
-    /*flex-basis: 0;*/
     min-width: 70%;
     max-width: 100%;
     width: 100%;
+}
+
+.errormsg {
+    color: red;
+    display: none;
 }
 
 body {

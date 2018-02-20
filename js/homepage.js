@@ -2,12 +2,28 @@ var app = window.app || {};
 
 app.initMap = function () {
     // Initialize the ViewModel
-    ko.applyBindings(new app.ViewModel());
+    ko.applyBindings(new app.ViewModel(), document.getElementById('nav'));
 };
 
-app.mapApiError = function () {
+app.errorModel = new function () {
+    self = this;
 
-    alert("Error loading Google Map API");
+    self.errorMsg = ko.observable();
+    self.visible = ko.observable('none');
+
+    this.mapApiError = function (message) {
+        self.errorMsg(message);
+        self.visible('block');
+    };
+};
+
+// app.errorModel = new app.ErrorModel();
+app.node = document.getElementById('header');
+ko.applyBindings(app.errorModel, app.node);
+
+app.googleLoadError = function(){
+    app.errorModel.mapApiError("Google Maps API failed to load");
+    // alert("Google Maps API failed to load");
 };
 
 //
