@@ -6,7 +6,7 @@ app.initMap = function () {
 };
 
 //
-app.Foursquare = function (loc, def_loc) {
+app.Foursquare = function (loc, defLoc) {
     'use strict';
     var self = this;
     var name = loc.name();
@@ -14,16 +14,16 @@ app.Foursquare = function (loc, def_loc) {
 
 
     // Initial string for query
-    var apiURL = "https://api.foursquare.com/v2/venues/";
-    var clientID = "OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG";
-    var clientSecret = "5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X";
-    var version = "20170912";
+    var API_URL = "https://api.foursquare.com/v2/venues/";
+    var CLIENT_ID = "OBNNEB0ELVH2RJLJKBUGCYU25EJ2KKOCIYC0CYX25XZ1LDUG";
+    var CLIENT_SECRET = "5CMBNN3VHMYTYJJHNTF2CBI2DUJCUIEFPV3MSP4OWTMEOL4X";
+    var VERSION = "20170912";
 
-    var url = apiURL + def_loc.fsq_id + '?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=' + version;
+    var url = API_URL + defLoc.fsq_id + '?client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&v=' + VERSION;
 
     $.getJSON(url, function (result) {
-        loc.fsq_venue(result.response.venue);
-        console.log("4Sq Result name: " + loc.fsq_venue().name + " phone: " + loc.fsq_venue().contact.formattedPhone);
+        loc.fsqVenue(result.response.venue);
+        console.log("4Sq Result name: " + loc.fsqVenue().name + " phone: " + loc.fsqVenue().contact.formattedPhone);
         // console.log(self.result);
     }).fail(function () {
         alert("Foursquare Query Failed");
@@ -41,33 +41,33 @@ app.Location = function (name, location) {
     this.place_info = ko.observable();
     this.marker = ko.observable();
     this.foursquare = ko.observable();
-    this.fsq_venue = ko.observable();
-    this.fsq_venue_id = ko.observable();
+    this.fsqVenue = ko.observable();
+    this.fsqVenueId = ko.observable();
     this.defaultIcon = null;
     this.clickedIcon = null;
     this.phone = function () {
-        if (this.fsq_venue().contact)
-            return this.fsq_venue().contact.formattedPhone;
+        if (this.fsqVenue().contact)
+            return this.fsqVenue().contact.formattedPhone;
         return null;
     };
 
     this.description = function () {
-        return this.fsq_venue().description;
+        return this.fsqVenue().description;
     };
 
     this.url = function () {
-        return this.fsq_venue().url;
+        return this.fsqVenue().url;
     };
 
     this.hours = function () {
-        if (this.fsq_venue().hours)
-            return this.fsq_venue().hours.status;
+        if (this.fsqVenue().hours)
+            return this.fsqVenue().hours.status;
         return null;
     };
 
-    this.price_tier = function () {
-        if (this.fsq_venue().price)
-            return this.fsq_venue().price.message;
+    this.priceTier = function () {
+        if (this.fsqVenue().price)
+            return this.fsqVenue().price.message;
         return null;
     };
 
@@ -114,7 +114,7 @@ app.ViewModel = function () {
     'use strict';
     var self = this;
 
-    var default_locations = [
+    var defaultLocations = [
         {title: "Wild Oats Bakery & Cafe", location: {lat: 43.9149431, lng: -69.9660507}, fsq_id: "4b9e6089f964a5203bde36e3"},
         {title: "Tao Yuan Restaurant", location: {lat: 43.914225, lng: -69.969562}, fsq_id: "4fb6c7f4e4b094ed55f49309"},
         {title: "Frontier", location: {lat: 43.9197608, lng: -69.969129}, fsq_id: "4ac238e5f964a520489820e3"},
@@ -153,8 +153,8 @@ app.ViewModel = function () {
     this.visibleLocations = ko.observableArray([]);
     this.visibleLocations.extend({rateLimit: 50});
 
-    this.default_zoom = 13;
-    this.default_location = {
+    this.DEFAULT_ZOOM = 13;
+    this.defaultLocation = {
         lat: 43.9140162,
         lng: -69.96699599999999
     };
@@ -285,8 +285,8 @@ app.ViewModel = function () {
                 content += '<a href=' + loc.url() + '>Website</a>';
             if (loc.hours())
                 content += '<p>' + loc.hours() + '</p>';
-            if (loc.price_tier())
-                content += '<p>Price: ' + loc.price_tier() + '</p>';
+            if (loc.priceTier())
+                content += '<p>Price: ' + loc.priceTier() + '</p>';
             content += "<p>Powered by Foursquare</p>";
             content += '</div>';
 
@@ -301,7 +301,7 @@ app.ViewModel = function () {
     }
 
     function init_map() {
-        self.default_location = new google.maps.LatLng(self.default_location);
+        self.defaultLocation = new google.maps.LatLng(self.defaultLocation);
 
         self.highlightedIcon = makeMarkerIcon('FFFF24');
         self.clickedIcon = makeMarkerIcon('1E90FF');
@@ -309,8 +309,8 @@ app.ViewModel = function () {
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
         self.map = new google.maps.Map(getMapLocation(), {
-            center: self.default_location,
-            zoom: self.default_zoom,
+            center: self.defaultLocation,
+            zoom: self.DEFAULT_ZOOM,
             mapTypeControl: false
         });
 
@@ -320,7 +320,7 @@ app.ViewModel = function () {
         self.bounds = new google.maps.LatLngBounds();
 
         // Setup initial locations...initiate using a Google Places search for each location
-        default_locations.forEach(function (l) {
+        defaultLocations.forEach(function (l) {
             console.log(l.title);
             var request = {
                 location: l.location,
