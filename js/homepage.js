@@ -5,7 +5,7 @@ app.initMap = function () {
     ko.applyBindings(new app.viewModel(), document.getElementById('nav'));
 };
 
-app.errorModel = new function () {
+app.ErrorModel = function () {
     self = this;
 
     self.errorMsg = ko.observable();
@@ -19,7 +19,7 @@ app.errorModel = new function () {
 
 // app.errorModel = new app.ErrorModel();
 app.node = document.getElementById('header');
-ko.applyBindings(app.errorModel, app.node);
+ko.applyBindings(app.errorModel = new app.ErrorModel(), app.node);
 
 app.googleLoadError = function(){
     app.errorModel.mapApiError("Google Maps API failed to load");
