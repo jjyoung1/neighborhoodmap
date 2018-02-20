@@ -101,7 +101,7 @@ app.Location = function (name, location) {
         // } else {
         this.marker.setAnimation(google.maps.Animation.BOUNCE);
         // }
-        setTimeout(this.stopBounce, 2000, this);
+        setTimeout(this.stopBounce, 1400, this);
 
     };
 
