@@ -6,7 +6,7 @@ app.initMap = function () {
 };
 
 app.ErrorModel = function () {
-    self = this;
+    var self = this;
 
     self.errorMsg = ko.observable();
     self.visible = ko.observable('none');
@@ -221,7 +221,7 @@ app.viewModel = function () {
     this.listItemClicked = function (loc) {
         var marker = loc.marker;
 
-        populateInfoWindow(marker, self.infowindow);
+        self.populateInfoWindow(marker, self.infowindow);
         resetMarkerIcons();
         loc.setIcon(self.clickedIcon);
         loc.startBounce();
@@ -249,7 +249,7 @@ app.viewModel = function () {
             // Setup marker behavior
             marker.addListener('click', function (loc) {
                 return function () {
-                    populateInfoWindow(this, self.infowindow);
+                    self.populateInfoWindow(this, self.infowindow);
                     loc.setIcon(self.clickedIcon);
                     loc.startBounce();
                 };
@@ -299,27 +299,33 @@ app.viewModel = function () {
     function resetMarkerIcons() {
         for (var i = 0; i < self.locations().length; i++) {
             // Reset icon for markers without an open infowindow
-            if (self.infowindow.marker !== self.locations()[i].marker)
+            if (self.infowindow.marker !== self.locations()[i].marker) {
                 self.locations()[i].setIcon(self.defaultIcon);
+            }
         }
     }
 
-    function populateInfoWindow(marker, infowindow) {
+    self.populateInfoWindow = function(marker, infowindow) {
         if (infowindow.marker !== marker) {
             var loc = findLocationForMarker(marker);
             infowindow.marker = marker;
             var content = '<div id="ifw" class="ifw">';
             content += '<h1 class="ifw-title">' + loc.name() + '</h1>';
-            if (loc.phone())
+            if (loc.phone()) {
                 content += '<p>Phone: ' + loc.phone() + '</p>';
-            if (loc.description())
+            }
+            if (loc.description()) {
                 content += '<p>' + loc.description() + '</p>';
-            if (loc.url())
+            }
+            if (loc.url()) {
                 content += '<a href=' + loc.url() + '>Website</a>';
-            if (loc.hours())
+            }
+            if (loc.hours()) {
                 content += '<p>' + loc.hours() + '</p>';
-            if (loc.priceTier())
+            }
+            if (loc.priceTier()) {
                 content += '<p>Price: ' + loc.priceTier() + '</p>';
+            }
             content += "<p>Powered by Foursquare</p>";
             content += '</div>';
 
@@ -331,17 +337,17 @@ app.viewModel = function () {
                 resetMarkerIcons();
             });
         }
-    }
+    };
 
     function init_map() {
         self.defaultLocation = new google.maps.LatLng(self.defaultLocation);
 
-        self.highlightedIcon = makeMarkerIcon('FFFF24');
-        self.clickedIcon = makeMarkerIcon('1E90FF');
+        self.highlightedIcon = self.makeMarkerIcon('FFFF24');
+        self.clickedIcon = self.makeMarkerIcon('1E90FF');
 
         // Creates a new map at the default location and inserts it into the page
         // returns the map handle to caller
-        self.map = new google.maps.Map(getMapLocation(), {
+        self.map = new google.maps.Map(self.getMapLocation(), {
             center: self.defaultLocation,
             zoom: self.DEFAULT_ZOOM,
             mapTypeControl: false
@@ -374,7 +380,7 @@ app.viewModel = function () {
     // This function takes in a COLOR, and then creates a new marker
     // icon of that color. The icon will be 21 px wide by 34 high, have an origin
     // of 0, 0 and be anchored at 10, 34).
-    function makeMarkerIcon(markerColor) {
+    self.makeMarkerIcon = function(markerColor) {
         var markerImage = new google.maps.MarkerImage(
             'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
             '|40|_|%E2%80%A2',
@@ -383,11 +389,11 @@ app.viewModel = function () {
             new google.maps.Point(10, 34),
             new google.maps.Size(21, 34));
         return markerImage;
-    }
+    };
 
-    function getMapLocation() {
+    self.getMapLocation = function() {
         return $('#map')[0];
-    }
+    };
 
     init_map();
 };
